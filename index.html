@@ -1,337 +1,398 @@
 <html>
   <head>
-    <title>Workether</title>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/4.0.4/bignumber.min.js'></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+		<meta charset="utf-8"/>
+		<title>Orkeztra Mineable Contract &ndash; Alpha</title>
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+	
+		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+
+		
+		<!--<script src='https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/4.0.4/bignumber.min.js'></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">-->
+		<link rel="stylesheet" href="style.css">
   </head>
   <body>
+		<header>
+			<span class="name icon-orkeztra">Orkeztra</span>
+			<span class="subtitle">First Mineable Contract &mdash; Alpha</span>
+			<a class="headerlink" href="https://github.com/nimiq-network" target="_blank">GitHub</a>
+			<a class="headerlink" href="https://nimiq.com/" target="_blank">Website</a>
+			<a class="headerlink" href="https://nimiq.watch/" target="_blank">Explorer</a>
+		</header>
+
+		<div id="content">
+			<div id="overlay">
+				<div class="message">
+					Orkeztra miner is already running in another browser window or tab.
+					<br><br>
+					<small>Please use only one window/tab at a time.</small>
+				</div>
+			</div>
+
+			
+			<div class="left">
+				<div class="info">
+					<div class="info-title">Wallet</div>
+					<hr/>
+
+					<div class="info-block wallet-address">
+						<strong>ERC20 Contract Address</strong>
+						<span id="contractaddress"></span>
+					</div>
+					<div class="info-block wallet-balance">
+						<strong>Balance</strong>
+						<span id="mybalance"></span>
+					</div>
+					<div class="info-block wallet-nonce">
+						<strong>Randomness</strong>
+						<span id="randomness"></span>
+					</div>
+					<hr/>
+				</div>
+
+				<div class="info">
+					<div class="info-title">Transaction</div>
+					<hr class="morespace"/>
+					<form>
+						<div class="input-group">
+						  <label for="txRecipientAddr">Recipient</label>
+						  <input id="transferaddress" type="text" placeholder="address" name="recipientAddr" maxlength="45" size="42">
+						</div>
+						<div class="input-group">
+							<label for="txValue">Value</label>
+							<input id="transferamount" name="value" type="text" placeholder="amount" step="any">
+						</div>
+						<div class="input-group">
+							<label for="txFee">Fee</label>
+							<input id="txFee" name="fee" type="number" step="0.01">
+						</div>
+						<hr class="morespace"/>
+						<div class="input-group">
+							<button type="button" id="txSubmitBtn" onclick="javascript:transfer();">Transfer</button>
+						</div>
+						<hr/>
+					</form>
+				</div>
+				
+				<div class="info">
+					<div class="info-title">Miner</div>
+						<hr/>
+						<div class="info-block">
+							<strong>Working</strong>
+							<span id="mnrWorking"></span>
+						</div>
+						<div class="info-block">
+							<strong>Hashrate</strong>
+							<span id="mnrHashrate"></span> H/s
+						</div>
+						<div class="info-block">
+							<strong>Last block mined at</strong>
+							<span id="mnrLastBlockTs"></span>
+						</div>
+						<div class="input-group">
+							<button type="button" class="btn btn-outline-primary" id="startmining" onclick="javascript:startMining();">Start mining</button>&nbsp;<button type="button" class="btn btn-outline-danger" id="stopmining" onclick="javascript:stopMining();">Stop mining</button>
+						</div>
+						<hr/>
+					</div>
+		
+				</div>
+			</div>
+
+			
+			<div class="right">
+				<div class="info">
+					<div class="info-title not-connected" id="blockchain-title">Blockchain</div>
+					<hr/>
+
+					<div class="info-block">
+						<strong>Height</strong>
+						<span id="blocknumber"></span>
+					</div>
+					<div class="info-block">
+						<strong>Target</strong>
+						<span id="target"></span>
+					</div>
+					<div class="info-block">
+						<strong>Total supply</strong>
+						<span id="totalsupply"></span>
+					</div>
+					<hr/>
+				</div>
+
+				<div class="info">
+					<div class="info-title">Head Block</div>
+					<hr/>
+
+					<div class="info-block">
+						<strong>Last mined on</strong>
+						<span id="lastminedon"></span>
+					</div>
+					<div class="info-block">
+						<strong>Nonce</strong>
+						<span id="nonce"></span>
+					</div>
+					<div class="info-block">
+						<strong>Block Reward</strong>
+						<span id="blockreward"></span>
+					</div>
+					<hr/>
+				</div>
+
+				<div class="info">
+					<div class="info-title">Network</div>
+					<hr/>
+
+					<div class="info-block">
+						<strong>Network</strong>
+						<span id="network"></span>
+					</div>
+				</div>
+			</div>
+			
+
+		  <div class="row">
+			<div class="col-12" id="miningevents"></div>
+		  </div>
+
+		  <hr/>
 
 
-
- <div class="container">
-
-      <h1><i>MetaMetaMeta!</i> Token</h1>
-       <h3>First ERC20 token you can mine in browser</h3>
-      <p class="lead">Meta-mining on Ethereum platform. Why? Because why not. <br/><a href="https://github.com/Overtorment/MetaMining" target="_blank">Gihub & specs</a></p>
-
-      <h3>Info</h3>
-      <p><span id="name"></span> v<span id="version"></span>. ERC20 contract address: <span id="contractaddress"></span></p>
-
-      <div class="row">
-        <div class="col-6" ><b>your balance</b></div>
-        <div class="col-6" ><b>randomness</b></div>
-      </div>
-
-      <div class="row">
-        <div class="col-6" id="mybalance"></div>
-        <div class="col-6" id="randomness"></div>
-      </div>
-
-      <hr/>
-
-      <div class="row">
-        <div class="col-12" id="">Transfer <input type="text" placeholder="amount" id="transferamount" size="4" /> tokens to <input id="transferaddress" size="40" type="text" placeholder="address"/>&nbsp;<button  type="button" class="btn btn-outline-secondary"  onclick="javascript:transfer();">transfer</button></div>
-      </div>
-
-      <hr/>
-
-      <div class="row">
-        <div class="col-12"><b>target</b></div>
-      </div>
-
-      <div class="row">
-        <div class="col-12" id="target"></div>        
-      </div>
-
-      <hr/>
-
-      
-      <div class="row">
-        <div class="col-6" ><b>total supply to date</b></div>
-        <div class="col-6" ><b>last mined on</b></div>
-      </div>
-
-      <div class="row">
-        <div class="col-6" id="totalsupply"></div>
-        <div class="col-6" id="lastminedon"></div>
-      </div>
-
-      <hr/>
-
-      
-      <div class="row">
-        <div class="col-6" ><b>block reward</b></div>
-        <div class="col-6" ><b>blocks found</b></div>
-      </div>
-
-      <div class="row">
-        <div class="col-6" id="blockreward"></div>
-        <div class="col-6" id="blocknumber"></div>
-      </div>
-
-      <hr/>
-
-    
-      <div class="row">
-        <div class="col-6" ><b>network</b></div>
-        <div class="col-6" ><b></b></div>
-      </div>
-
-      <div class="row">
-        <div class="col-6" id="network"></div>
-        <div class="col-6" id=""></div>
-      </div>
-
-      <hr/>
-
-
-      <div class="row">
-        <div class="col-3" ><button type="button" class="btn btn-outline-primary" id="startmining" onclick="javascript:startMining();">Start mining</button>&nbsp;<button type="button" class="btn btn-outline-danger" id="stopmining" onclick="javascript:stopMining();">Stop mining</button></div>
-        <div class="col-3" id="miningstatus"></div>
-        <div class="col-3" id="mininginfo"></div>
-      </div>
-
-      <hr/>
-
-      <div class="row">
-        <div class="col-12" id="miningevents"></div>
-      </div>
-
-      <hr/>
-
-
-    </div> <!-- /container -->
-
-
-
-
-
-
-
-
-
-
-
-    <script type="text/javascript">
-    var decimals = 1;
-    var name = "";
-    var symbol = "tokens";
-    var miningStatus = 'stopped';
-    var miningIter = 0;
-    var target;
-    var randomness;
-    var contractAddress
-    contractAddress = '0x9fc2f7bb67F01F2b06d71974EfBdf26f6A2F3336'; // main net
-    function startApp(){
-      var abi = [ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string", "value": "Workether" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getRamdomness", "outputs": [ { "name": "currentRandomness", "type": "uint256", "value": "3.8103703891173207887736990542977748221809773144285332074961292160395041455791e+76" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "blockReward", "outputs": [ { "name": "", "type": "uint256", "value": "50000000000000000000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "nonce", "type": "uint256" }, { "name": "currentRandomness", "type": "uint256" }, { "name": "currentTarget", "type": "uint256" } ], "name": "checkProofOfWork", "outputs": [ { "name": "workAccepted", "type": "bool", "value": false } ], "payable": false, "stateMutability": "pure", "type": "function" }, { "constant": false, "inputs": [], "name": "mint", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256", "value": "1.006322438356164383561643e+24" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "coinAge", "outputs": [ { "name": "myCoinAge", "type": "uint256", "value": "3.015967315068493150684929e+24" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "timestamp", "type": "uint256" } ], "name": "ownerSetStakeStartTime", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "maxTotalSupply", "outputs": [ { "name": "", "type": "uint256", "value": "1e+25" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8", "value": "18" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "randomness", "outputs": [ { "name": "", "type": "uint256", "value": "3.8103703891173207887736990542977748221809773144285332074961292160395041455791e+76" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "nonce", "type": "uint256" } ], "name": "mine", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string", "value": "0.1.0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "blockNumber", "outputs": [ { "name": "", "type": "uint256", "value": "0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "chainStartTime", "outputs": [ { "name": "", "type": "uint256", "value": "1512917888" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "powLimit", "outputs": [ { "name": "", "type": "uint256", "value": "1.766847064778384329583297500742918515827483896875618958121606201292619775e+72" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "halvingInterval", "outputs": [ { "name": "", "type": "uint32", "value": "210000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256", "value": "0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "stakeStartTime", "outputs": [ { "name": "", "type": "uint256", "value": "1512917888" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [ { "name": "", "type": "address", "value": "0x8a75ff000589d114288fa6b7ca9fe51b9fb69283" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string", "value": "WTHR" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "totalInitialSupply", "outputs": [ { "name": "", "type": "uint256", "value": "1e+24" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "nonce", "type": "uint256" }, { "name": "currentRandomness", "type": "uint256" } ], "name": "hash", "outputs": [ { "name": "", "type": "uint256", "value": "1.8569430475105882587588266137607568536673111973893317399460219858819262702947e+76" } ], "payable": false, "stateMutability": "pure", "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "lastMinedOn", "outputs": [ { "name": "", "type": "uint40", "value": "1512917888" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "annualInterest", "outputs": [ { "name": "interest", "type": "uint256", "value": "770000000000000000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "stakeMinAge", "outputs": [ { "name": "", "type": "uint256", "value": "60" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "target", "outputs": [ { "name": "", "type": "uint256", "value": "1.76682010483171717894350283372783149619681025973119641754912509768237056e+72" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "nonce", "type": "uint256" } ], "name": "checkMine", "outputs": [ { "name": "success", "type": "bool", "value": false } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256", "value": "0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "stakeMaxAge", "outputs": [ { "name": "", "type": "uint256", "value": "600" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "maxMintProofOfStake", "outputs": [ { "name": "", "type": "uint256", "value": "100000000000000000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "newOwner", "type": "address" } ], "name": "transferOwnership", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_miner", "type": "address" }, { "indexed": false, "name": "_reward", "type": "uint256" }, { "indexed": false, "name": "_seconds", "type": "uint40" } ], "name": "Mine", "type": "event" }, { "anonymous": false, "inputs": [], "name": "RewardHalved", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_address", "type": "address" }, { "indexed": false, "name": "_reward", "type": "uint256" } ], "name": "Mint", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "owner", "type": "address" }, { "indexed": true, "name": "spender", "type": "address" }, { "indexed": false, "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "from", "type": "address" }, { "indexed": true, "name": "to", "type": "address" }, { "indexed": false, "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" } ]
-      var MyContract = web3.eth.contract(abi);
-      myContractInstance = MyContract.at(contractAddress);
-      myContractInstance.allEvents([], function(error, log){
-        if (!error) {
-          console.log(log);
-          if (log.event == 'Mine') {
-            $("#miningevents").append('Someone at ' + log.args._miner + ' mined ' + ((log.args._reward.dividedBy((new BigNumber("10")).toPower(decimals))).toString(10)) +' ' + symbol + ', took ' + log.args._seconds.toString(10) + ' seconds <br/>')
-          } else {
-            $("#miningevents").append(log.event + ': ' + JSON.stringify(log.args));
-          }
-        } else {
-          console.log(error);
-        }
-      });
-      myContractInstance.name(function(err, rz){
-        name = rz
-      })
-      myContractInstance.symbol(function(err, rz){
-        symbol = rz
-      })
-      myContractInstance.decimals(function(err, rz){
-        decimals = rz
-      })
-      setInterval(function(){
-          web3.eth.getAccounts(function(error, accounts){
-              if (error) return;
-              myContractInstance.balanceOf(accounts[0], function(err, rez) { 
-                rez = rez.dividedBy((new BigNumber("10")).toPower(decimals));
-                $("#mybalance").text('' + rez.toString(10) + ' ' + symbol + ' (on ' + accounts[0] + ')');
-              })
-          })        
-      }, 3000);
-      setInterval(function(){      
-          myContractInstance.totalSupply(function(err, rez) {
-            if (err) return;
-            rez = rez.dividedBy((new BigNumber("10")).toPower(decimals));
-            $("#totalsupply").text( rez.toString(10) + ' ' + symbol);
-          })
-      }, 3000);
-      
-      setInterval(function(){
-          myContractInstance.lastMinedOn(function(err, rez) {
-            if (err) return;
-            $("#lastminedon").text(  (new Date(rez.toString(10) * 1000)).toGMTString()   + " ("+(rez.toString(10)) + ")");
-          })
-      }, 3000);
-      setInterval(function(){
-          myContractInstance.blockReward(function(err, rez) {
-            if (err) return;
-            rez = rez.dividedBy((new BigNumber("10")).toPower(decimals));
-            $("#blockreward").text( rez.toString(10) + ' ' + symbol);
-          })
-      }, 3000);
-      setInterval(function(){
-          myContractInstance.getRamdomness(function(err, rez){
-            if (err) return;
-            randomness = rez
-            $("#randomness").text(rez.toString(16));
-          })
-      }, 3000);
-      setInterval(function(){
-          myContractInstance.target(function(err, rez) {
-            if (err) return;
-            target = rez
-            var target2display = rez.toString(16);
-            if (target2display.length < 64) {
-              target2display = ('0'.repeat(64-target2display.length)) + rez.toString(16)
-            }
-            $("#target").text(target2display)
-          })
-      }, 3000);
-      setInterval(function(){
-          myContractInstance.version(function(err, ver){
-            if (err) return;
-            $("#version").text(ver)
-          })
-      }, 3000);
-      setInterval(function(){
-          myContractInstance.blockNumber(function(err, num){
-            if (err) return;
-            $("#blocknumber").text(num.toString(10))
-          })
-      }, 3000);
-      setInterval(function(){
-          myContractInstance.name(function(err, ver){
-            if (err) return;
-            $("#name").text(ver)
-          })
-      }, 3000);
-      setInterval(function(){
-          $("#miningstatus").text(miningStatus)
-      }, 3000);
-      setInterval(function(){
-          $("#contractaddress").text(contractAddress)
-      }, 3000);
-      setInterval(function(){
-          myContractInstance.target(function(err, rez){
-              if (err) return;
-              web3.version.getNetwork((err, netId) => {
-                switch (netId) {
-                  case "1":
-                    $("#network").text('This is Main network.')
-                    break
-                  case "2":
-                    $("#network").text('This is TestNet network.')
-                    /*$("body").empty().append('please switch to Main network and reload this Dapp');*/
-                    break
-                  case "3":
-                    $("#network").text('This is TestNet network.')
-                    /*$("body").empty().append('please switch to Main network and reload this Dapp');*/
-                    break
-                  default:
-                  $("#network").text('This is TestNet network.')
-                  /*$("body").empty().append('please switch to Main network and reload this Dapp');*/
-                }
-              })
-          })
-      }, 3000);
-    }
-    function  stopMining() {
-      miningStatus = 'stopped';
-    }
-    function startMining() {
-      miningStatus = 'mining';
-          var nonce = new BigNumber(0);
-          var cycle = function() {
-            if (miningStatus == 'stopped') return;
-            if (miningIter%500 == 0) $("#mininginfo").text('total hashes: ' + miningIter);
-            miningIter++;
-            if (Math.floor(Math.random()*1000 + 1) == 5000) { // re-randomizing or incrementing?
-              var rand = BigNumber.random(64).toString().replace('0.', '');
-              nonce = new BigNumber(rand);
-            } else {
-              nonce = nonce.add(1)
-            }
-            var newNonce = nonce.add(randomness);
-            var toHash = '0x' + newNonce.toString(16)
-            if (newNonce.toString(16).length < 64) {
-              toHash = '0x' + ('0'.repeat(64-newNonce.toString(16).length)) + newNonce.toString(16)
-            }
-            var sha = web3.sha3( toHash, {encoding: 'hex'})
-            sha = new BigNumber(sha);
-            if (sha.lessThan(target)){
-              console.log('golden nonce = ', nonce.toString(10))
-              myContractInstance.mine('0x'+nonce.toString(16), function(err, rez){
-                console.log(err, rez)
-                // TODO: update status, handle reject error...
-                setTimeout(function(){cycle()}, 0)
-              });
-            } else {
-              setTimeout(function(){cycle()}, 0)
-            }
-          }
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-          cycle()
-    }
-    function transfer(){
-      var addr = $("#transferaddress").val();
-      var amount = $("#transferamount").val();
-      amount = amount * Math.pow(10, decimals);
-      if (confirm("Are you sure you want to transfer " + amount + " satoshis to " + addr)) {
-        myContractInstance.transfer(addr, amount, function(){})
-      }
-    }
-    </script>
-      
+		</div> <!-- /container -->
 
 
 
 
 
-    <script type="text/javascript">
-      window.addEventListener('load', function() {
-        // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-        if (typeof web3 !== 'undefined') {
-          // Use Mist/MetaMask's provider
-          window.web3 = new Web3(web3.currentProvider);
-          console.log('I sense web3...')
-          startApp()
-        } else {
-          $("body").empty().append('<h1>This Dapp requires Metamask</h1><a href="https://metamask.io/" target="__blank"><img src="https://github.com/MetaMask/faq/raw/master/images/download-metamask.png"/></a>');
-        }
-      })
-    </script>
 
 
 
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 
+		<script type="text/javascript">
+		var decimals = 1;
+		var name = "";
+		var symbol = "tokens";
+		var miningStatus = 'stopped';
+		var miningIter = 0;
+		var target;
+		var randomness;
+		var contractAddress
+		contractAddress = '0x9fc2f7bb67F01F2b06d71974EfBdf26f6A2F3336'; // main net
+		function startApp(){
+		  var abi = [ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string", "value": "Workether" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getRamdomness", "outputs": [ { "name": "currentRandomness", "type": "uint256", "value": "3.8103703891173207887736990542977748221809773144285332074961292160395041455791e+76" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "blockReward", "outputs": [ { "name": "", "type": "uint256", "value": "50000000000000000000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "nonce", "type": "uint256" }, { "name": "currentRandomness", "type": "uint256" }, { "name": "currentTarget", "type": "uint256" } ], "name": "checkProofOfWork", "outputs": [ { "name": "workAccepted", "type": "bool", "value": false } ], "payable": false, "stateMutability": "pure", "type": "function" }, { "constant": false, "inputs": [], "name": "mint", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256", "value": "1.006322438356164383561643e+24" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "coinAge", "outputs": [ { "name": "myCoinAge", "type": "uint256", "value": "3.015967315068493150684929e+24" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "timestamp", "type": "uint256" } ], "name": "ownerSetStakeStartTime", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "maxTotalSupply", "outputs": [ { "name": "", "type": "uint256", "value": "1e+25" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8", "value": "18" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "randomness", "outputs": [ { "name": "", "type": "uint256", "value": "3.8103703891173207887736990542977748221809773144285332074961292160395041455791e+76" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "nonce", "type": "uint256" } ], "name": "mine", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string", "value": "0.1.0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "blockNumber", "outputs": [ { "name": "", "type": "uint256", "value": "0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "chainStartTime", "outputs": [ { "name": "", "type": "uint256", "value": "1512917888" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "powLimit", "outputs": [ { "name": "", "type": "uint256", "value": "1.766847064778384329583297500742918515827483896875618958121606201292619775e+72" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "halvingInterval", "outputs": [ { "name": "", "type": "uint32", "value": "210000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256", "value": "0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "stakeStartTime", "outputs": [ { "name": "", "type": "uint256", "value": "1512917888" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [ { "name": "", "type": "address", "value": "0x8a75ff000589d114288fa6b7ca9fe51b9fb69283" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string", "value": "WTHR" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "totalInitialSupply", "outputs": [ { "name": "", "type": "uint256", "value": "1e+24" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "nonce", "type": "uint256" }, { "name": "currentRandomness", "type": "uint256" } ], "name": "hash", "outputs": [ { "name": "", "type": "uint256", "value": "1.8569430475105882587588266137607568536673111973893317399460219858819262702947e+76" } ], "payable": false, "stateMutability": "pure", "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "lastMinedOn", "outputs": [ { "name": "", "type": "uint40", "value": "1512917888" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "annualInterest", "outputs": [ { "name": "interest", "type": "uint256", "value": "770000000000000000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "stakeMinAge", "outputs": [ { "name": "", "type": "uint256", "value": "60" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "target", "outputs": [ { "name": "", "type": "uint256", "value": "1.76682010483171717894350283372783149619681025973119641754912509768237056e+72" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "nonce", "type": "uint256" } ], "name": "checkMine", "outputs": [ { "name": "success", "type": "bool", "value": false } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256", "value": "0" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "stakeMaxAge", "outputs": [ { "name": "", "type": "uint256", "value": "600" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "maxMintProofOfStake", "outputs": [ { "name": "", "type": "uint256", "value": "100000000000000000" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "newOwner", "type": "address" } ], "name": "transferOwnership", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_miner", "type": "address" }, { "indexed": false, "name": "_reward", "type": "uint256" }, { "indexed": false, "name": "_seconds", "type": "uint40" } ], "name": "Mine", "type": "event" }, { "anonymous": false, "inputs": [], "name": "RewardHalved", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_address", "type": "address" }, { "indexed": false, "name": "_reward", "type": "uint256" } ], "name": "Mint", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "owner", "type": "address" }, { "indexed": true, "name": "spender", "type": "address" }, { "indexed": false, "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "from", "type": "address" }, { "indexed": true, "name": "to", "type": "address" }, { "indexed": false, "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" } ]
+		  var MyContract = web3.eth.contract(abi);
+		  myContractInstance = MyContract.at(contractAddress);
+		  myContractInstance.allEvents([], function(error, log){
+			if (!error) {
+			  console.log(log);
+			  if (log.event == 'Mine') {
+				$("#miningevents").append('Someone at ' + log.args._miner + ' mined ' + ((log.args._reward.dividedBy((new BigNumber("10")).toPower(decimals))).toString(10)) +' ' + symbol + ', took ' + log.args._seconds.toString(10) + ' seconds <br/>')
+			  } else {
+				$("#miningevents").append(log.event + ': ' + JSON.stringify(log.args));
+			  }
+			} else {
+			  console.log(error);
+			}
+		  });
+		  myContractInstance.name(function(err, rz){
+			name = rz
+		  })
+		  myContractInstance.symbol(function(err, rz){
+			symbol = rz
+		  })
+		  myContractInstance.decimals(function(err, rz){
+			decimals = rz
+		  })
+		  setInterval(function(){
+			  web3.eth.getAccounts(function(error, accounts){
+				  if (error) return;
+				  myContractInstance.balanceOf(accounts[0], function(err, rez) { 
+					rez = rez.dividedBy((new BigNumber("10")).toPower(decimals));
+					$("#mybalance").text('' + rez.toString(10) + ' ' + symbol + ' (on ' + accounts[0] + ')');
+				  })
+			  })        
+		  }, 3000);
+		  setInterval(function(){      
+			  myContractInstance.totalSupply(function(err, rez) {
+				if (err) return;
+				rez = rez.dividedBy((new BigNumber("10")).toPower(decimals));
+				$("#totalsupply").text( rez.toString(10) + ' ' + symbol);
+			  })
+		  }, 3000);
+		  
+		  setInterval(function(){
+			  myContractInstance.lastMinedOn(function(err, rez) {
+				if (err) return;
+				$("#lastminedon").text(  (new Date(rez.toString(10) * 1000)).toGMTString()   + " ("+(rez.toString(10)) + ")");
+			  })
+		  }, 3000);
+		  setInterval(function(){
+			  myContractInstance.blockReward(function(err, rez) {
+				if (err) return;
+				rez = rez.dividedBy((new BigNumber("10")).toPower(decimals));
+				$("#blockreward").text( rez.toString(10) + ' ' + symbol);
+			  })
+		  }, 3000);
+		  setInterval(function(){
+			  myContractInstance.getRamdomness(function(err, rez){
+				if (err) return;
+				randomness = rez
+				$("#randomness").text(rez.toString(16));
+			  })
+		  }, 3000);
+		  setInterval(function(){
+			  myContractInstance.target(function(err, rez) {
+				if (err) return;
+				target = rez
+				var target2display = rez.toString(16);
+				if (target2display.length < 64) {
+				  target2display = ('0'.repeat(64-target2display.length)) + rez.toString(16)
+				}
+				$("#target").text(target2display)
+			  })
+		  }, 3000);
+		  setInterval(function(){
+			  myContractInstance.version(function(err, ver){
+				if (err) return;
+				$("#version").text(ver)
+			  })
+		  }, 3000);
+		  setInterval(function(){
+			  myContractInstance.blockNumber(function(err, num){
+				if (err) return;
+				$("#blocknumber").text(num.toString(10))
+			  })
+		  }, 3000);
+		  setInterval(function(){
+			  myContractInstance.name(function(err, ver){
+				if (err) return;
+				$("#name").text(ver)
+			  })
+		  }, 3000);
+		  setInterval(function(){
+			  $("#miningstatus").text(miningStatus)
+		  }, 3000);
+		  setInterval(function(){
+			  $("#contractaddress").text(contractAddress)
+		  }, 3000);
+		  setInterval(function(){
+			  myContractInstance.target(function(err, rez){
+				  if (err) return;
+				  web3.version.getNetwork((err, netId) => {
+					switch (netId) {
+					  case "1":
+						$("#network").text('This is Main network.')
+						break
+					  case "2":
+						$("#network").text('This is TestNet network.')
+						/*$("body").empty().append('please switch to Main network and reload this Dapp');*/
+						break
+					  case "3":
+						$("#network").text('This is TestNet network.')
+						/*$("body").empty().append('please switch to Main network and reload this Dapp');*/
+						break
+					  default:
+					  $("#network").text('This is TestNet network.')
+					  /*$("body").empty().append('please switch to Main network and reload this Dapp');*/
+					}
+				  })
+			  })
+		  }, 3000);
+		}
+		function  stopMining() {
+		  miningStatus = 'stopped';
+		}
+		function startMining() {
+		  miningStatus = 'mining';
+			  var nonce = new BigNumber(0);
+			  var cycle = function() {
+				if (miningStatus == 'stopped') return;
+				if (miningIter%500 == 0) $("#mininginfo").text('total hashes: ' + miningIter);
+				miningIter++;
+				if (Math.floor(Math.random()*1000 + 1) == 5000) { // re-randomizing or incrementing?
+				  var rand = BigNumber.random(64).toString().replace('0.', '');
+				  nonce = new BigNumber(rand);
+				} else {
+				  nonce = nonce.add(1)
+				}
+				var newNonce = nonce.add(randomness);
+				var toHash = '0x' + newNonce.toString(16)
+				if (newNonce.toString(16).length < 64) {
+				  toHash = '0x' + ('0'.repeat(64-newNonce.toString(16).length)) + newNonce.toString(16)
+				}
+				var sha = web3.sha3( toHash, {encoding: 'hex'})
+				sha = new BigNumber(sha);
+				if (sha.lessThan(target)){
+				  console.log('golden nonce = ', nonce.toString(10))
+				  myContractInstance.mine('0x'+nonce.toString(16), function(err, rez){
+					console.log(err, rez)
+					// TODO: update status, handle reject error...
+					setTimeout(function(){cycle()}, 0)
+				  });
+				} else {
+				  setTimeout(function(){cycle()}, 0)
+				}
+			  }
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+			  cycle()
+		}
+		function transfer(){
+		  var addr = $("#transferaddress").val();
+		  var amount = $("#transferamount").val();
+		  amount = amount * Math.pow(10, decimals);
+		  if (confirm("Are you sure you want to transfer " + amount + " satoshis to " + addr)) {
+			myContractInstance.transfer(addr, amount, function(){})
+		  }
+		}
+		</script>
+		  
+
+
+
+
+
+		<!--<script type="text/javascript">
+		  window.addEventListener('load', function() {
+			// Checking if Web3 has been injected by the browser (Mist/MetaMask)
+			if (typeof web3 !== 'undefined') {
+			  // Use Mist/MetaMask's provider
+			  window.web3 = new Web3(web3.currentProvider);
+			  console.log('I sense web3...')
+			  startApp()
+			} else {
+			  $("body").empty().append('<h1>This Dapp requires Metamask</h1><a href="https://metamask.io/" target="__blank"><img src="https://github.com/MetaMask/faq/raw/master/images/download-metamask.png"/></a>');
+			}
+		  })
+		</script>-->
+
+
+
+
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<!--
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+		-->
 
   </body>
 </html>
