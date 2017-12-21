@@ -327,6 +327,7 @@
 				var sha = web3.sha3( toHash, {encoding: 'hex'})
 				sha = new BigNumber(sha);
 				if (sha.lessThan(target)){
+				  $("#nonce").text(nonce.toString(10))
 				  console.log('golden nonce = ', nonce.toString(10))
 				  myContractInstance.mine('0x'+nonce.toString(16), function(err, rez){
 					console.log(err, rez)
