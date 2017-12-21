@@ -78,7 +78,7 @@
 						<hr/>
 						<div class="info-block">
 							<strong>Working</strong>
-							<span id="accounts[0]"></span>
+							<span id="accounts"></span>
 						</div>
 						<div class="info-block">
 							<strong>Hashrate</strong>
@@ -207,6 +207,15 @@
 				  myContractInstance.balanceOf(accounts[0], function(err, rez) { 
 					rez = rez.dividedBy((new BigNumber("10")).toPower(decimals));
 					$("#mybalance").text('' + rez.toString(10) + ' ' + symbol + ' (on ' + accounts[0] + ')');
+				  })
+			  })        
+		  }, 3000);
+		  setInterval(function(){
+			  web3.eth.getAccounts(function(error, accounts){
+				  if (error) return;
+				  myContractInstance.accounts(accounts[0], function(err, rez) { 
+					rez = rez;
+					$("#accounts").text('accounts[0]');
 				  })
 			  })        
 		  }, 3000);
